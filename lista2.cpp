@@ -178,7 +178,7 @@ if(!comidita.empty()){
 for(list<comida *>::iterator ky=comidita.begin();ky!=comidita.end();++ky){
 delete (*ky);
 }
-for(int kk=comidita.size();kk>=0;kk--){
+for(int kk=comidita.size();kk>0;kk--){
 comidita.pop_back();
 }
 }
@@ -186,7 +186,7 @@ if(!culebra.empty()){
 for(list<comida *>::iterator kx=comidita.begin();kx!=comidita.end();++kx){
 delete (*kx);
 }
-for(int kk=culebra.size();kk>=0;kk--){
+for(int kk=culebra.size();kk>0;kk--){
 culebra.pop_back();
 }
 }
@@ -561,24 +561,18 @@ main(){
 oc();
 int opc=0;
 int nivel;
-int niv,vel;
 while(1){
 opc=menu(0);
 int puntos=0;
-gotoxy(0,0);
-printf("%d",opc);
-getch();
+int niv,vel;
+niv=((opc-1)/4)-1;
+vel=100-((opc-1)%4)*25;
 if(opc==0){
 return 0;
 }else if(opc>4 && opc<=28){
-niv=((opc-1)/4)-1;
-vel=100-((opc-1)%4)*25;
-gotoxy(0,0);
-printf("%d",vel);
-getch();
 jugarCampana(niv,vel,puntos,1);
 }else if(opc<=4){
-jugarCampana(opc-1,vel,puntos,0);
+jugarCampana(0,vel,puntos,0);
 }
 }
 }
