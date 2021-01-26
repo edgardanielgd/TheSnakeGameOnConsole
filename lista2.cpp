@@ -507,7 +507,7 @@ gotoxy(1,0);
 printf("Muevase con w,a,s,d");
 gotoxy(1,1);
 printf("U para salir");
-inicio(comidita,culebra,cabeza,cola,5,10,11);
+inicio(comidita,culebra,cabeza,cola,5,7,8);
 gotoxy(20,1);
 printf("Nivel: %d",nivel);
 cuadro1(nivel,laberinto);
@@ -555,6 +555,7 @@ main(){
 oc();
 int opc=0;
 int nivel;
+int niv,vel;
 while(1){
 opc=menu(0);
 int puntos=0;
@@ -564,14 +565,15 @@ getch();
 if(opc==0){
 return 0;
 }else if(opc>4 && opc<=28){
-int niv;
 niv=((opc-1)/4)-1;
-jugarCampana(niv,100,puntos,1);
+vel=100-((opc-1)%4)*25;
+gotoxy(0,0);
+printf("%d",vel);
+getch();
+jugarCampana(niv,vel,puntos,1);
 }else if(opc<=4){
-jugarCampana(opc-1,100,puntos,0);
+jugarCampana(opc-1,vel,puntos,0);
 }
 }
 }
-
-//
 
