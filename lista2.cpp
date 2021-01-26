@@ -6,7 +6,7 @@
 #include<time.h>
 #include<fstream>
 #include<string>
-int c=2,co=1,ca=21,limInfX=2,limMaX=50,limInfY=2,limMaY=20;
+int c=157,co=207,ca=189,limInfX=2,limMaX=50,limInfY=2,limMaY=20;
 char salir='u';
 using namespace std;
 void gotoxy(int x,int y){
