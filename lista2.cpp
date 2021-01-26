@@ -326,7 +326,9 @@ void cuadro1(int nivel,list<muro *> &laberinto){
 for(list<muro *>::iterator t1=laberinto.begin();t1!=laberinto.end();++t1){
 delete (*t1);
 }
-for(int i=laberinto.size();i>=0;i--){
+gotoxy(0,0);
+printf("%d",laberinto.size());
+for(int i=laberinto.size();i>0;i--){
 laberinto.pop_back();
 }
 if(nivel==0){
@@ -510,6 +512,7 @@ printf("U para salir");
 inicio(comidita,culebra,cabeza,cola,5,7,8);
 gotoxy(20,1);
 printf("Nivel: %d",nivel);
+gotoxy(0,0);
 cuadro1(nivel,laberinto);
 Sleep(2000);
 while(!fin or nivel>5){
@@ -543,12 +546,15 @@ Sleep(velocidad);
 int reloj=difftime(time(0),reloj1);
 system("cls");
 gotoxy(5,5);
-int retor=(nivel*50000)/(reloj*velocidad);
+int retor=(reloj>0)?0:(nivel*50000)/(reloj*velocidad);
 if (nivel>5){
 printf("Ha gamado\nPuntos Obtenidos: %d\nPuntos de bonificacion: %d\nTotal: %d",puntos,retor,puntos+retor);
 }else
 printf("Ha perdido\nPuntos Obtenidos: %d\nPuntos de bonificacion: %d\nTotal: %d",puntos,retor,puntos+retor);
 puntos+=retor;
+Sleep(1000);
+getch();
+
 }
 //
 main(){
