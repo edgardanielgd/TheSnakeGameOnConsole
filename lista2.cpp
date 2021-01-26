@@ -577,5 +577,3 @@ jugarCampana(opc-1,vel,puntos,0);
 }
 }
 
-//
-
