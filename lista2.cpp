@@ -6,9 +6,14 @@
 #include<time.h>
 #include<fstream>
 #include<string>
+#include<sstream>
+using namespace std;
+struct dato{
+	string nombre;
+	int puntuacion;
+}puntuaciones[10];
 int c=157,co=207,ca=189,limInfX=2,limMaX=50,limInfY=2,limMaY=20;
 char salir='u';
-using namespace std;
 void gotoxy(int x,int y){
 HANDLE k;
 k=GetStdHandle(STD_OUTPUT_HANDLE);
@@ -24,6 +29,53 @@ CONSOLE_CURSOR_INFO d;
 d.bVisible=false;
 d.dwSize=12;
 SetConsoleCursorInfo(l,&d);
+}
+void leerStats(){
+	string contenido;
+	fstream archivo("Scores.txt");
+	if(archivo.fail())return;
+	int contador=0;
+	while(getline(archivo,contenido)){
+		if(contador>9)break;
+		if(contenido.size()>15){
+			puntuaciones[contador].nombre=contenido.substr(0,15);
+		}else puntuaciones[contador].nombre=contenido;
+		if(getline(archivo,contenido)){
+			if(contenido.size()>10){
+				puntuaciones[contador].puntuacion=atoi(contenido.substr(0,10).c_str());	
+			}else puntuaciones[contador].puntuacion=atoi(contenido.c_str());
+		}else puntuaciones[contador].puntuacion=0;
+		contador++;
+	}
+	archivo.close();
+}
+
+void ordenar(){
+for(int i=1;i<10;i++){
+int nRetroceso=1;
+while((puntuaciones+(i-nRetroceso))->puntuacion < (puntuaciones+(i-nRetroceso+1))->puntuacion ){
+int tmp_cod=(puntuaciones+(i-nRetroceso))->puntuacion;
+string tmp_char=(puntuaciones+(i-nRetroceso))->nombre;
+(puntuaciones+(i-nRetroceso))->puntuacion=(puntuaciones+(i-nRetroceso+1))->puntuacion;
+(puntuaciones+(i-nRetroceso))->nombre=(puntuaciones+(i-nRetroceso+1))->nombre;
+(puntuaciones+(i-nRetroceso+1))->puntuacion=tmp_cod;
+(puntuaciones+(i-nRetroceso+1))->nombre=tmp_char;
+nRetroceso++;
+if(i-nRetroceso<0)break;
+}
+}
+}
+void imprimirStats(){
+	ofstream archivo("Scores.txt");
+	string cadena;
+	for(int i=0;i<10;i++){
+		if(puntuaciones[i].nombre=="" && puntuaciones[i].puntuacion==0)continue;
+		cadena.append(puntuaciones[i].nombre);
+		cadena.append("\n");
+		cadena.append(to_string(puntuaciones[i].puntuacion).c_str());
+		cadena.append("\n");
+	}
+	archivo.write(cadena.c_str(),cadena.size());
 }
 class punto{
 private:
@@ -553,11 +605,14 @@ printf("Ha gamado\nPuntos Obtenidos: %d\nPuntos de bonificacion: %d\nTotal: %d",
 printf("Ha perdido\nPuntos Obtenidos: %d\nPuntos de bonificacion: %d\nTotal: %d",puntos,retor,puntos+retor);
 puntos+=retor;
 Sleep(1000);
+imprimirStats();
 getch();
 
 }
 //
-main(){
+void Funcion_principal(){
+leerStats();
+ordenar();
 oc();
 int opc=0;
 int nivel;
@@ -568,12 +623,15 @@ int niv,vel;
 niv=((opc-1)/4)-1;
 vel=100-((opc-1)%4)*25;
 if(opc==0){
-return 0;
+return;
 }else if(opc>4 && opc<=28){
 jugarCampana(niv,vel,puntos,1);
 }else if(opc<=4){
 jugarCampana(0,vel,puntos,0);
 }
 }
+}
+main(){
+Funcion_principal();
 }
 
