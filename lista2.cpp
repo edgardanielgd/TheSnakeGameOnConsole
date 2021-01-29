@@ -76,6 +76,7 @@ void imprimirStats(){
 		cadena.append("\n");
 	}
 	archivo.write(cadena.c_str(),cadena.size());
+	archivo.close();
 }
 class punto{
 private:
@@ -605,8 +606,17 @@ printf("Ha gamado\nPuntos Obtenidos: %d\nPuntos de bonificacion: %d\nTotal: %d",
 printf("Ha perdido\nPuntos Obtenidos: %d\nPuntos de bonificacion: %d\nTotal: %d",puntos,retor,puntos+retor);
 puntos+=retor;
 Sleep(1000);
+if(puntos>puntuaciones[9].puntuacion){
+system("cls");
+gotoxy(0,0);
+printf("Digita tu nombre:\n");
+char *input=(char*)malloc(10);
+fgets(input,10,stdin);
+puntuaciones[9].nombre=(char*)input;
+puntuaciones[9].puntuacion=puntos;
+ordenar();
 imprimirStats();
-getch();
+}
 
 }
 //
