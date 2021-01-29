@@ -6,9 +6,14 @@
 #include<time.h>
 #include<fstream>
 #include<string>
-int c=2,co=1,ca=21,limInfX=2,limMaX=50,limInfY=2,limMaY=20;
-char salir='u';
+#include<sstream>
 using namespace std;
+struct dato{
+	string nombre;
+	int puntuacion;
+}puntuaciones[10];
+int c=157,co=207,ca=189,limInfX=2,limMaX=50,limInfY=2,limMaY=20;
+char salir='u';
 void gotoxy(int x,int y){
 HANDLE k;
 k=GetStdHandle(STD_OUTPUT_HANDLE);
@@ -24,6 +29,53 @@ CONSOLE_CURSOR_INFO d;
 d.bVisible=false;
 d.dwSize=12;
 SetConsoleCursorInfo(l,&d);
+}
+void leerStats(){
+	string contenido;
+	fstream archivo("Scores.txt");
+	if(archivo.fail())return;
+	int contador=0;
+	while(getline(archivo,contenido)){
+		if(contador>9)break;
+		if(contenido.size()>15){
+			puntuaciones[contador].nombre=contenido.substr(0,15);
+		}else puntuaciones[contador].nombre=contenido;
+		if(getline(archivo,contenido)){
+			if(contenido.size()>10){
+				puntuaciones[contador].puntuacion=atoi(contenido.substr(0,10).c_str());	
+			}else puntuaciones[contador].puntuacion=atoi(contenido.c_str());
+		}else puntuaciones[contador].puntuacion=0;
+		contador++;
+	}
+	archivo.close();
+}
+
+void ordenar(){
+for(int i=1;i<10;i++){
+int nRetroceso=1;
+while((puntuaciones+(i-nRetroceso))->puntuacion < (puntuaciones+(i-nRetroceso+1))->puntuacion ){
+int tmp_cod=(puntuaciones+(i-nRetroceso))->puntuacion;
+string tmp_char=(puntuaciones+(i-nRetroceso))->nombre;
+(puntuaciones+(i-nRetroceso))->puntuacion=(puntuaciones+(i-nRetroceso+1))->puntuacion;
+(puntuaciones+(i-nRetroceso))->nombre=(puntuaciones+(i-nRetroceso+1))->nombre;
+(puntuaciones+(i-nRetroceso+1))->puntuacion=tmp_cod;
+(puntuaciones+(i-nRetroceso+1))->nombre=tmp_char;
+nRetroceso++;
+if(i-nRetroceso<0)break;
+}
+}
+}
+void imprimirStats(){
+	ofstream archivo("Scores.txt");
+	string cadena;
+	for(int i=0;i<10;i++){
+		if(puntuaciones[i].nombre=="" && puntuaciones[i].puntuacion==0)continue;
+		cadena.append(puntuaciones[i].nombre);
+		cadena.append("\n");
+		cadena.append(to_string(puntuaciones[i].puntuacion).c_str());
+		cadena.append("\n");
+	}
+	archivo.write(cadena.c_str(),cadena.size());
 }
 class punto{
 private:
@@ -178,7 +230,7 @@ if(!comidita.empty()){
 for(list<comida *>::iterator ky=comidita.begin();ky!=comidita.end();++ky){
 delete (*ky);
 }
-for(int kk=comidita.size();kk>=0;kk--){
+for(int kk=comidita.size();kk>0;kk--){
 comidita.pop_back();
 }
 }
@@ -186,7 +238,7 @@ if(!culebra.empty()){
 for(list<comida *>::iterator kx=comidita.begin();kx!=comidita.end();++kx){
 delete (*kx);
 }
-for(int kk=culebra.size();kk>=0;kk--){
+for(int kk=culebra.size();kk>0;kk--){
 culebra.pop_back();
 }
 }
@@ -326,7 +378,9 @@ void cuadro1(int nivel,list<muro *> &laberinto){
 for(list<muro *>::iterator t1=laberinto.begin();t1!=laberinto.end();++t1){
 delete (*t1);
 }
-for(int i=laberinto.size();i>=0;i--){
+gotoxy(0,0);
+printf("%d",laberinto.size());
+for(int i=laberinto.size();i>0;i--){
 laberinto.pop_back();
 }
 if(nivel==0){
@@ -510,6 +564,7 @@ printf("U para salir");
 inicio(comidita,culebra,cabeza,cola,5,7,8);
 gotoxy(20,1);
 printf("Nivel: %d",nivel);
+gotoxy(0,0);
 cuadro1(nivel,laberinto);
 Sleep(2000);
 while(!fin or nivel>5){
@@ -543,37 +598,40 @@ Sleep(velocidad);
 int reloj=difftime(time(0),reloj1);
 system("cls");
 gotoxy(5,5);
-int retor=(nivel*50000)/(reloj*velocidad);
+int retor=(reloj>0)?0:(nivel*50000)/(reloj*velocidad);
 if (nivel>5){
 printf("Ha gamado\nPuntos Obtenidos: %d\nPuntos de bonificacion: %d\nTotal: %d",puntos,retor,puntos+retor);
 }else
 printf("Ha perdido\nPuntos Obtenidos: %d\nPuntos de bonificacion: %d\nTotal: %d",puntos,retor,puntos+retor);
 puntos+=retor;
+Sleep(1000);
+imprimirStats();
+getch();
+
 }
 //
-main(){
+void Funcion_principal(){
+leerStats();
+ordenar();
 oc();
 int opc=0;
 int nivel;
-int niv,vel;
 while(1){
 opc=menu(0);
 int puntos=0;
-gotoxy(0,0);
-printf("%d",opc);
-getch();
-if(opc==0){
-return 0;
-}else if(opc>4 && opc<=28){
+int niv,vel;
 niv=((opc-1)/4)-1;
 vel=100-((opc-1)%4)*25;
-gotoxy(0,0);
-printf("%d",vel);
-getch();
+if(opc==0){
+return;
+}else if(opc>4 && opc<=28){
 jugarCampana(niv,vel,puntos,1);
 }else if(opc<=4){
-jugarCampana(opc-1,vel,puntos,0);
+jugarCampana(0,vel,puntos,0);
 }
 }
+}
+main(){
+Funcion_principal();
 }
 
