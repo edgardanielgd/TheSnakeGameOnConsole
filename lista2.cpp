@@ -78,6 +78,18 @@ void imprimirStats(){
 	archivo.write(cadena.c_str(),cadena.size());
 	archivo.close();
 }
+void imprimirStatsConsola(){
+	system("cls");
+	printf("Nombre\t\tPuntuacion\n");
+	for(int i=0;i<10;i++){
+		gotoxy(0,i+1);
+		printf("%d. %s",i+1,puntuaciones[i].nombre.c_str());
+		gotoxy(16,i+1);
+		printf("%d\n",puntuaciones[i].puntuacion);
+	}
+	getch();
+	
+}
 class punto{
 private:
 int x,y,xan,yan;
@@ -516,6 +528,9 @@ return opt;
 if(sel==13 && seleccion==5 && tipo==0){
 return 0;
 }
+if(sel==13 && seleccion==2 && tipo==0){
+return 29;
+}
 if(sel==13 && seleccion==8 && tipo==1){
 system("cls");
 return 0;
@@ -612,6 +627,7 @@ gotoxy(0,0);
 printf("Digita tu nombre:\n");
 char *input=(char*)malloc(10);
 fgets(input,10,stdin);
+strtok(input,"\n");
 puntuaciones[9].nombre=(char*)input;
 puntuaciones[9].puntuacion=puntos;
 ordenar();
@@ -638,6 +654,8 @@ return;
 jugarCampana(niv,vel,puntos,1);
 }else if(opc<=4){
 jugarCampana(0,vel,puntos,0);
+}else if(opc==29){
+imprimirStatsConsola();
 }
 }
 }
