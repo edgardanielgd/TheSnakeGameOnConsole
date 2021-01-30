@@ -6,7 +6,6 @@
 #include<time.h>
 #include<fstream>
 #include<string>
-#include<sstream>
 using namespace std;
 struct dato{
 	string nombre;
@@ -22,11 +21,11 @@ co.X=x;
 co.Y=y;
 SetConsoleCursorPosition(k,co);
 }
-void oc(){
+void oc(bool valor){
 HANDLE l;
 l=GetStdHandle(STD_OUTPUT_HANDLE);
 CONSOLE_CURSOR_INFO d;
-d.bVisible=false;
+d.bVisible=valor;
 d.dwSize=12;
 SetConsoleCursorInfo(l,&d);
 }
@@ -226,6 +225,50 @@ x=_x_;
 }
 void SetY(int _y_){
 y=_y_;
+}
+};
+class cursorDesign{
+int x,y;
+public:
+cursorDesign(){}
+cursorDesign(int _x,int _y):x(_x),y(_y){
+oc(true);
+gotoxy(x,y);
+}
+void mover(char direccion){
+	switch(direccion){
+		case 'w':{
+			y--;
+			gotoxy(x,y);
+			break;
+		}
+		case 's':{
+			y++;
+			gotoxy(x,y);
+			break;
+		}
+		case 'a':{
+			x--;
+			gotoxy(x,y);
+			break;
+		}
+		case 'd':{
+			x++;
+			gotoxy(x,y);
+			break;
+		}
+	}
+}
+void pintar(bool pared){
+	gotoxy(x,y);
+	(pared)?printf("%c",178):printf(" ");
+	gotoxy(x,y);
+}
+int GetX(){
+	return x;
+}
+int GetY(){
+	return y;
 }
 };
 void crearM(int x,int y,list<muro *> &laberinto){
@@ -531,6 +574,9 @@ return 0;
 if(sel==13 && seleccion==2 && tipo==0){
 return 29;
 }
+if(sel==13 && seleccion==3 && tipo==0){
+return 30;
+}
 if(sel==13 && seleccion==8 && tipo==1){
 system("cls");
 return 0;
@@ -635,11 +681,67 @@ imprimirStats();
 }
 
 }
+void crearNivel(){
+system("cls");
+printf("Digite el nombre del mapa\n");
+char cadena[24];
+fgets(cadena,20,stdin);
+strtok(cadena,"\n");
+system("cls");
+gotoxy(0,0);
+printf("Muevase con las teclas W,A,S,D.\nPresione 't' para crear o quitar un muro. Cuando finalice presione U");
+cursorDesign *cursor1=new cursorDesign(10,10);
+int arreglo[limMaY][limMaX];
+for(int z=0;z<limMaY;z++){
+	for(int y=0;y<limMaX;y++){
+		arreglo[z][y]=0;
+	}
+}
+while(1){
+	
+	if(kbhit()){
+		char a=getch();
+		if(a=='u')break;
+		if(a=='w' && cursor1->GetY()-1<3)continue;
+		if(a=='a' && cursor1->GetX()-1<3)continue;
+		if(a=='s' && cursor1->GetY()+1>limMaY+3)continue;
+		if(a=='d' && cursor1->GetX()+1>limMaX+3)continue;
+		cursor1->mover(a);
+		if(a=='t'){
+			int x=cursor1->GetX();
+			int y=cursor1->GetY();
+			if(arreglo[y][x]!=0){
+				arreglo[y][x]=0;
+				cursor1->pintar(false);
+			}else
+			arreglo[y][x]=1;
+			cursor1->pintar(true);
+		}
+	}
+}
+system("cls");
+gotoxy(0,0);
+char *write=(char*)malloc((limMaX+1)*(limMaY));
+for(int i=0;i<limMaY;i++){
+	for(int j=0;j<limMaX;j++){
+		*(write+(i*limMaX+j))=*(to_string(arreglo[i][j]).c_str());
+	}
+	*(write+(i*limMaX+limMaX-1))='\n';
+}
+strcat(cadena,".txt");
+char path[50]="customLevels\\";
+strcat(path,cadena);
+ofstream archivo;
+archivo.open(path);
+archivo.write(write,(limMaX*limMaY));
+archivo.close();
+oc(false);
+}
 //
 void Funcion_principal(){
 leerStats();
 ordenar();
-oc();
+oc(false);
 int opc=0;
 int nivel;
 while(1){
@@ -656,6 +758,8 @@ jugarCampana(niv,vel,puntos,1);
 jugarCampana(0,vel,puntos,0);
 }else if(opc==29){
 imprimirStatsConsola();
+}else if(opc==30){
+crearNivel();
 }
 }
 }
