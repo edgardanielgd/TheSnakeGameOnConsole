@@ -689,40 +689,55 @@ fgets(cadena,20,stdin);
 strtok(cadena,"\n");
 system("cls");
 gotoxy(0,0);
-printf("Muevase con las teclas W,A,S,D.\nPresione 't' para crear o quitar un muro. Cuando finalice presione U");
+printf("Muevase con W,A,S,D. Presione 't' para crear o quitar un muro. Cuando finalice presione U");
 cursorDesign *cursor1=new cursorDesign(10,10);
-int arreglo[limMaY][limMaX];
-for(int z=0;z<limMaY;z++){
+int arreglo[limMaY-1][limMaX];
+for(int z=0;z<limMaY-1;z++){
 	for(int y=0;y<limMaX;y++){
 		arreglo[z][y]=0;
 	}
 }
+normal();
 while(1){
 	
 	if(kbhit()){
 		char a=getch();
 		if(a=='u')break;
-		if(a=='w' && cursor1->GetY()-1<3)continue;
-		if(a=='a' && cursor1->GetX()-1<3)continue;
-		if(a=='s' && cursor1->GetY()+1>limMaY+3)continue;
-		if(a=='d' && cursor1->GetX()+1>limMaX+3)continue;
+		if(a=='w' && cursor1->GetY()-1<2)continue;
+		if(a=='a' && cursor1->GetX()-1<2)continue;
+		if(a=='s' && cursor1->GetY()+1>limMaY)continue;
+		if(a=='d' && cursor1->GetX()+1>limMaX)continue;
 		cursor1->mover(a);
 		if(a=='t'){
 			int x=cursor1->GetX();
 			int y=cursor1->GetY();
-			if(arreglo[y][x]!=0){
-				arreglo[y][x]=0;
+			if(arreglo[y-limInfY][x-limInfX]!=0){
+				arreglo[y-limInfY][x-limInfX]=0;
 				cursor1->pintar(false);
-			}else
-			arreglo[y][x]=1;
+				if(x==limInfX && y==limInfY){
+					printf("%c",201);	
+				}else if(x==limInfX && y==limMaY){
+					printf("%c",200);
+				}else if(x==limMaX && y==limInfY){
+					printf("%c",187);
+				}else if(x==limMaX && y==limMaY){
+					printf("%c",188);
+				}else if(y==limMaY or y==limInfY){
+					printf("%c",205);
+				}else if(x==limMaX or x==limInfX){
+					printf("%c",186);
+				}
+			}else{
+			arreglo[y-limInfY][x-limInfX]=1;
 			cursor1->pintar(true);
+		}
 		}
 	}
 }
 system("cls");
 gotoxy(0,0);
 char *write=(char*)malloc((limMaX+1)*(limMaY));
-for(int i=0;i<limMaY;i++){
+for(int i=0;i<limMaY-1;i++){
 	for(int j=0;j<limMaX;j++){
 		*(write+(i*limMaX+j))=*(to_string(arreglo[i][j]).c_str());
 	}
@@ -733,7 +748,7 @@ char path[50]="customLevels\\";
 strcat(path,cadena);
 ofstream archivo;
 archivo.open(path);
-archivo.write(write,(limMaX*limMaY));
+archivo.write(write,(limMaX*(limMaY-1)));
 archivo.close();
 oc(false);
 }
