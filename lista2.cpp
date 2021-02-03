@@ -12,6 +12,11 @@ struct dato{
 	string nombre;
 	int puntuacion;
 }puntuaciones[10];
+struct mapa{
+	int id;
+	string nombre;
+	mapa *siguiente;
+};
 int c=157,co=207,ca=189,limInfX=2,limMaX=50,limInfY=2,limMaY=20;
 char salir='u';
 void gotoxy(int x,int y){
@@ -753,18 +758,119 @@ archivo.write(write,(limMaX*(limMaY-1)));
 archivo.close();
 oc(false);
 }
-void LeerCarpeta(){
+void LeerCarpeta(mapa *&primero){
+   mapa *aux=primero;
+   while(aux!=NULL){
+   		mapa *aux2=aux;
+   		aux=aux->siguiente;
+   		free(aux2);
+   		delete aux2;
+   }
    DIR *dr;
    struct dirent *en;
    dr = opendir("customLevels"); //open all directory
    if (dr) {
-      while ((en = readdir(dr)) != NULL) {
-         printf("%s %d %d\n",en->d_name,en->d_ino,en->d_reclen); //print all directory name
+   		int contador=1;
+   		mapa *ultimo=NULL;
+        while ((en = readdir(dr)) != NULL) {
+    	if(en->d_namlen>4){ //*.txt
+    	if(contador==1){
+    		primero=new mapa;
+    		primero->id=contador;
+    		contador++;
+    		primero->nombre=en->d_name;
+    		primero->siguiente=new mapa;
+    		ultimo=primero;
+    		aux=primero->siguiente;
+		}else{
+        aux->id=contador;
+        contador++;
+        aux->nombre=en->d_name;
+        aux->siguiente=new mapa;
+        ultimo=aux;
+        aux=aux->siguiente;
+    	}
+    }
       }
-      closedir(dr); //close all directory
-   }
+       delete ultimo->siguiente;
+       ultimo->siguiente=NULL;
+       mapa *aux2=primero;
+       closedir(dr); //close all directory
+   }else{
+   printf("No hay mapas aun...");
+   system("pause");
+   return;
 }
-//
+}
+void crearMapaCustom(mapa *primero,list<muro*> &laberinto){
+	int x=0,len=0;
+	mapa *aux=primero;
+	string sElegido;
+	while(aux!=NULL){
+		gotoxy(5,5+len);
+		if(aux->id==x+1){
+			sElegido=aux->nombre;
+			printf(">>>%s",aux->nombre.c_str());
+		}else printf("   %s",aux->nombre.c_str());
+		
+		len++;
+		aux=aux->siguiente;
+	}
+	gotoxy(5,5+len);
+	printf("   Volver");
+	int seleccion;
+	while(seleccion!=13){
+		seleccion=getch();
+		if(seleccion==224){
+			seleccion=getch();
+		}
+		if(seleccion==80){
+			x++;
+			if(x==len+1)x=0;
+		}
+		if(seleccion==72){
+			x--;
+			if(x==-1)x=len;
+		}
+		if(seleccion==80 or seleccion==72){
+		aux=primero;
+		int pos=0;
+		while(aux!=NULL){
+		gotoxy(5,5+pos++);
+		if(aux->id==x+1){
+			sElegido=aux->nombre;
+			printf(">>>");
+		}else printf("   ");
+		aux=aux->siguiente;
+		}
+		if(x==len){
+		gotoxy(5,5+pos);
+		printf(">>>");
+		}else {
+		gotoxy(5,5+pos);
+		printf("   ");
+		}
+	}
+	}
+	system("cls");
+	gotoxy(0,0);
+	for(list<muro*>::iterator it=laberinto.begin();it!=laberinto.end();++it){
+		delete *(it);
+	}
+	for(int i=0;i<laberinto.size();i++){
+		laberinto.pop_back();
+	}
+	if(x!=len){
+		string linea;
+		char path[50]="customLevels\\";
+		strcat(path,sElegido.c_str());
+		ifstream archivo(path);
+		while(getline(archivo,linea)){
+			//
+		}
+		printf(path);
+	}
+}
 void Funcion_principal(){
 leerStats();
 ordenar();
@@ -791,6 +897,10 @@ crearNivel();
 }
 }
 main(){
-LeerCarpeta();
+oc(false);
+mapa *primero=NULL;
+LeerCarpeta(primero);
+list<muro*> laberinto;
+crearMapaCustom(primero,laberinto);
 }
 
