@@ -6,6 +6,7 @@
 #include<time.h>
 #include<fstream>
 #include<string>
+#include<dirent.h>
 using namespace std;
 struct dato{
 	string nombre;
@@ -752,6 +753,17 @@ archivo.write(write,(limMaX*(limMaY-1)));
 archivo.close();
 oc(false);
 }
+void LeerCarpeta(){
+   DIR *dr;
+   struct dirent *en;
+   dr = opendir("customLevels"); //open all directory
+   if (dr) {
+      while ((en = readdir(dr)) != NULL) {
+         printf("%s %d %d\n",en->d_name,en->d_ino,en->d_reclen); //print all directory name
+      }
+      closedir(dr); //close all directory
+   }
+}
 //
 void Funcion_principal(){
 leerStats();
@@ -779,6 +791,6 @@ crearNivel();
 }
 }
 main(){
-Funcion_principal();
+LeerCarpeta();
 }
 
