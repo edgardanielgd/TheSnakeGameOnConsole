@@ -202,14 +202,19 @@ class muro{
 int x,y,xa,ya;
 public:
 muro(){}
-muro(int _x,int _y):x(_x),y(_y){
-gotoxy(x,y);
-printf("%c",219);
+muro(int _x,int _y,bool ocultar=false):x(_x),y(_y){
+if(!ocultar){
+dibujar();
+}
 actu();
 }
 void actu(){
 xa=x;
 ya=y;
+}
+void dibujar(){
+gotoxy(x,y);
+printf("%c",219);
 }
 void movi(int v,int q){
 gotoxy(xa,ya);
@@ -277,8 +282,8 @@ int GetY(){
 	return y;
 }
 };
-void crearM(int x,int y,list<muro *> &laberinto){
-muro *nuevoM=new muro(x,y);
+void crearM(int x,int y,list<muro *> &laberinto,bool ocultar=false){
+muro *nuevoM=new muro(x,y,ocultar);
 laberinto.push_back(nuevoM);
 nuevoM=NULL;
 delete nuevoM;
@@ -440,8 +445,6 @@ void cuadro1(int nivel,list<muro *> &laberinto){
 for(list<muro *>::iterator t1=laberinto.begin();t1!=laberinto.end();++t1){
 delete (*t1);
 }
-gotoxy(0,0);
-printf("%d",laberinto.size());
 for(int i=laberinto.size();i>0;i--){
 laberinto.pop_back();
 }
@@ -522,7 +525,7 @@ system("cls");
 char **elementos;
 int filas;
 int seleccion=1;
-if (tipo==0)filas=5;
+if (tipo==0)filas=6;
 if(tipo==2)filas=5;
 if(tipo==1)filas=8;
 elementos=new char*[filas];
@@ -533,8 +536,9 @@ if(tipo==0){
 *elementos=(char*)"Jugar";
 *(elementos+1)=(char*)"Mejores Puntajes";
 *(elementos+2)=(char*)"Crear Nivel";
-*(elementos+3)=(char*)"Tienda";
-*(elementos+4)=(char*)"Salir";
+*(elementos+3)=(char*)"Jugar nivel creado";
+*(elementos+4)=(char*)"Tienda";
+*(elementos+5)=(char*)"Salir";
 }else if(tipo==2){
 *elementos=(char*)"Facil";
 *(elementos+1)=(char*)"Corriente";
@@ -574,7 +578,7 @@ system("cls");
 return opt;
 }
 }
-if(sel==13 && seleccion==5 && tipo==0){
+if(sel==13 && seleccion==6 && tipo==0){
 return 0;
 }
 if(sel==13 && seleccion==2 && tipo==0){
@@ -582,6 +586,9 @@ return 29;
 }
 if(sel==13 && seleccion==3 && tipo==0){
 return 30;
+}
+if(sel==13 && seleccion==4 && tipo==0){
+return 31;
 }
 if(sel==13 && seleccion==8 && tipo==1){
 system("cls");
@@ -625,10 +632,6 @@ list<comida *> comidita;
 list<muro *> laberinto;
 time_t reloj1=time(0);
 system("cls");
-gotoxy(1,0);
-printf("Muevase con w,a,s,d");
-gotoxy(1,1);
-printf("U para salir");
 inicio(comidita,culebra,cabeza,cola,5,7,8);
 gotoxy(20,1);
 printf("Nivel: %d",nivel);
@@ -865,11 +868,53 @@ void crearMapaCustom(mapa *primero,list<muro*> &laberinto){
 		char path[50]="customLevels\\";
 		strcat(path,sElegido.c_str());
 		ifstream archivo(path);
+		int columna=0;
 		while(getline(archivo,linea)){
-			//
+			for(int i=0;i<linea.size();i++){
+				if(*(linea.c_str()+i)=='1'){
+					crearM(i+limInfX,limInfY+columna,laberinto,true);
+				}
+			}
+			columna++;
 		}
-		printf(path);
 	}
+}
+void jugarCustom(list<muro*> laberinto){
+punto *cabeza=NULL;
+punto *cola=NULL;
+int tempx,tempy;
+bool fin=false,crecer=false;
+int puntos;
+list<punto *> culebra;
+list<comida *> comidita;
+system("cls");
+gotoxy(1,0);
+printf("Muevase con w,a,s,d");
+gotoxy(1,1);
+printf("U para salir");
+gotoxy(0,0);
+normal();
+for(list<muro*>::iterator it=laberinto.begin();it!=laberinto.end();++it){
+(*it)->dibujar();
+}
+inicio(comidita,culebra,cabeza,cola,5,7,12);
+Sleep(2000);
+while(!fin){
+recibir(cabeza,fin);
+mover(culebra,fin,0,laberinto);
+crecimiento(culebra,cola,crecer,tempx,tempy);
+actualizar(culebra,cabeza);
+comer(cabeza,cola,comidita,laberinto,crecer,tempx,tempy,puntos,0);
+Sleep(100);
+}
+}
+void elegirJugarCustomLevel(){
+system("cls");
+mapa *primero=NULL;
+LeerCarpeta(primero);
+list<muro*> laberinto;
+crearMapaCustom(primero,laberinto);
+jugarCustom(laberinto);	
 }
 void Funcion_principal(){
 leerStats();
@@ -893,14 +938,12 @@ jugarCampana(0,vel,puntos,0);
 imprimirStatsConsola();
 }else if(opc==30){
 crearNivel();
+}else if(opc==31){
+elegirJugarCustomLevel();
 }
 }
 }
 main(){
-oc(false);
-mapa *primero=NULL;
-LeerCarpeta(primero);
-list<muro*> laberinto;
-crearMapaCustom(primero,laberinto);
+Funcion_principal();
 }
 
