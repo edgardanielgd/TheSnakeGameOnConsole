@@ -1,3 +1,5 @@
+edgar
+4700
 Danieluch
 2450
 Daniel
@@ -15,6 +17,4 @@ edgar
 Juancho G
 500
 DanielPRO
-500
-UyQueHizo
 500

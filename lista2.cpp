@@ -17,6 +17,14 @@ struct mapa{
 	string nombre;
 	mapa *siguiente;
 };
+struct itemTienda{
+	string hash;
+	string nombre;
+	int precio;
+	int codigo;
+	bool conseguido=false;
+	itemTienda *siguiente;
+};
 int c=157,co=207,ca=189,limInfX=2,limMaX=50,limInfY=2,limMaY=20;
 char salir='u';
 void gotoxy(int x,int y){
@@ -590,6 +598,9 @@ return 30;
 if(sel==13 && seleccion==4 && tipo==0){
 return 31;
 }
+if(sel==13 && seleccion==5 && tipo==0){
+return 32;
+}
 if(sel==13 && seleccion==8 && tipo==1){
 system("cls");
 return 0;
@@ -632,6 +643,10 @@ list<comida *> comidita;
 list<muro *> laberinto;
 time_t reloj1=time(0);
 system("cls");
+gotoxy(1,0);
+printf("Muevase con w,a,s,d");
+gotoxy(1,1);
+printf("U para salir");
 inicio(comidita,culebra,cabeza,cola,5,7,8);
 gotoxy(20,1);
 printf("Nivel: %d",nivel);
@@ -916,7 +931,109 @@ list<muro*> laberinto;
 crearMapaCustom(primero,laberinto);
 jugarCustom(laberinto);	
 }
+void InitTienda(itemTienda *&primero){
+primero=new itemTienda;
+primero->hash="wqk876WhrQ";
+primero->nombre="O rayada :P";
+primero->precio=0;
+primero->codigo=157;
+itemTienda *aux=NULL;
+primero->siguiente=new itemTienda;
+aux=primero->siguiente;
+aux->hash="g353q9dKGX";
+aux->nombre="Arroba";
+aux->precio=1000;
+aux->codigo=64;
+aux->siguiente= new itemTienda;
+aux=aux->siguiente;
+aux->hash="u98k9Z4vwj";
+aux->nombre="Copyrights";
+aux->precio=2000;
+aux->codigo=184;
+aux->siguiente=NULL;
+ifstream archivo;
+archivo.open("regs.txt");
+string hash;
+if(archivo.is_open()){
+	while(getline(archivo,hash)){
+		itemTienda *aux2=primero;
+		while(aux2!=NULL){
+			if(strcmp(hash.c_str(),aux2->hash.c_str())==0){
+				aux2->conseguido=true;
+			}
+			aux2=aux2->siguiente;
+		}
+	}
+}
+archivo.close();
+}
+void actualizarTienda(itemTienda *primero,int puntos){
+itemTienda *aux=primero;
+while(aux!=NULL){
+if(puntos>=aux->precio && !aux->conseguido){
+ofstream archivo;
+archivo.open("regs.txt",fstream::app);
+archivo.write(aux->hash.c_str(),aux->hash.size());
+archivo.write("\n",1);
+aux->conseguido=true;
+archivo.close();
+}
+aux=aux->siguiente;
+}
+}
+void seleccionarEstilo(itemTienda *primero){
+system("cls");
+itemTienda *aux=primero;
+struct itemDat{
+	int id;
+	int codigo;
+};
+list<itemDat*> lista;
+int contador=0;
+while(aux!=NULL){
+if(aux->conseguido){
+itemDat *newIt=new itemDat;
+newIt->id=contador;
+newIt->codigo=aux->codigo;
+lista.push_back(newIt);
+gotoxy(5,5+contador++);
+printf("   %s",aux->nombre.c_str());
+}
+aux=aux->siguiente;
+}
+gotoxy(5,5+contador);
+printf("   Volver");
+gotoxy(5,5);
+printf(">>>");
+int sel=0,x=0;
+while(sel!=13){
+sel=getch();
+if(sel==224)sel=getch();
+if(sel==72){
+gotoxy(5,5+x);
+printf("   ");
+x--;
+if(x<0)x=contador;
+gotoxy(5,5+x);
+printf(">>>");
+}
+if(sel==80){
+gotoxy(5,5+x);
+printf("   ");
+x++;
+if(x>contador)x=0;
+gotoxy(5,5+x);
+printf(">>>");
+}
+}
+if(x==contador)return;
+for(list<itemDat*>::iterator it=lista.begin();it!=lista.end();++it){
+	if((*it)->id==x)c=(*it)->codigo; //Change character for the snake
+}
+}
 void Funcion_principal(){
+itemTienda *primero=NULL;
+InitTienda(primero);
 leerStats();
 ordenar();
 oc(false);
@@ -940,7 +1057,10 @@ imprimirStatsConsola();
 crearNivel();
 }else if(opc==31){
 elegirJugarCustomLevel();
+}else if(opc==32){
+seleccionarEstilo(primero);
 }
+actualizarTienda(primero,puntos);
 }
 }
 main(){
